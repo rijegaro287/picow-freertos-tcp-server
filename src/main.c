@@ -19,12 +19,15 @@ void noise_task(void *pvParameters) {
 int main() {
 	stdio_init_all();
 
-	tcp_server_config_t *tcp_server_config = (tcp_server_config_t*)pvPortMalloc(sizeof(tcp_server_config_t));
-	tcp_server_config->ssid = "Familia Gatgens";
-	tcp_server_config->password = "adita123";
-	tcp_server_config->port = 4242;
-	tcp_server_config->processing_queue.buffer_size = BUFFER_SIZE;
-	tcp_server_config->processing_queue.handle = xQueueCreate(PROCESSING_QUEUE_SIZE, BUFFER_SIZE);
+	tcp_server_config_t tcp_server_config = {
+		.ssid = "Familia Gatgens",
+		.password = "adita123",
+		.port = 4242,
+		.processing_queue = {
+			.buffer_size = BUFFER_SIZE,
+			.handle = xQueueCreate(PROCESSING_QUEUE_SIZE, BUFFER_SIZE)
+		}
+	};
 
 	TaskHandle_t tcp_server_handle = NULL;
 	TaskHandle_t processing_handle = NULL;
@@ -33,14 +36,14 @@ int main() {
 	xTaskCreate(tcp_server_task, 
 						  "tcp server",
 							configMINIMAL_STACK_SIZE,
-							tcp_server_config,
+							&tcp_server_config,
 							5,
 							&tcp_server_handle);
 
 	xTaskCreate(processing_task,
 						  "processing",
 							configMINIMAL_STACK_SIZE,
-							&(tcp_server_config->processing_queue),
+							&(tcp_server_config.processing_queue),
 							5,
 							&processing_handle);
 
