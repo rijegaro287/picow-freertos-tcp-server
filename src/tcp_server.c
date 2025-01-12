@@ -85,11 +85,12 @@ static void tcp_server_listen(tcp_server_config_t *config) {
 			uint8_t recv_buffer[recv_max_size];
 
 			if(recv(conn_sock, recv_buffer, recv_max_size, 0) > 0) {
-        xQueueSend(config->processing_queue.handle, recv_buffer, 0);
         if (uxQueueSpacesAvailable(config->processing_queue.handle) == 0) {
           printf("Processing queue is full\n");
           send(conn_sock, "1", 1, 0);
-        } else {
+        }
+        else {
+          xQueueSend(config->processing_queue.handle, recv_buffer, 0);
           send(conn_sock, "0", 1, 0);
         }
 			}

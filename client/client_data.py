@@ -12,7 +12,7 @@ n_channels = wave_file.getnchannels()
 n_samples = wave_file.getnframes()
 sample_width = wave_file.getsampwidth()
 sample_rate = wave_file.getframerate()
-buffer_size = 1024
+buffer_size = 128
 
 out_file = wave.open('./test_data/sine_wave_1khz_out.wav', 'wb')
 out_file.setnchannels(n_channels)
@@ -26,7 +26,7 @@ print(f'Sample rate: {sample_rate}')
 
 
 ip_addr = "192.168.100.70"
-port = 8080
+port = 4242
 
 start = time.time()
 for i in range(0, n_samples, buffer_size // sample_width):
@@ -34,7 +34,7 @@ for i in range(0, n_samples, buffer_size // sample_width):
     client_socket.connect((ip_addr, port))
 
     frames = wave_file.readframes(buffer_size // sample_width)
-    # print(f'-- Frames:\n{frames.hex()}')
+    print(f'-- Frames:\n{frames.hex()}')
 
     client_socket.send(frames)
 
@@ -45,8 +45,9 @@ for i in range(0, n_samples, buffer_size // sample_width):
         print('-- Connection closed by server')
         break
     else:
-        # print(f'-- Response:\n{response.hex()}')
-        out_file.writeframes(response)
+        print(f'-- Response: {response.decode()}')
+        if response.decode() == '1':
+            time.sleep(100e-3)
 
     client_socket.settimeout(None)
 
