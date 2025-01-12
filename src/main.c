@@ -5,7 +5,7 @@
 #include "processing.h"
 
 
-#define PROCESSING_QUEUE_SIZE 10
+#define PROCESSING_QUEUE_SIZE 3
 #define BUFFER_SIZE 128
 
 

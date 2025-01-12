@@ -1,4 +1,5 @@
 import socket
+import time
 
 ip_addr = "192.168.100.70"
 
@@ -26,6 +27,9 @@ while True:
         break
     else:
         print(f'\n-- Server Response: {response.decode()}\n')
+        if response.decode() == '1':
+            time.sleep(100e-3)
+
 
     client_socket.settimeout(None)
 

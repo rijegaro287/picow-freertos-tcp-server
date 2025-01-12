@@ -75,29 +75,27 @@ static void tcp_server_listen(tcp_server_config_t *config) {
 
 	while (true) {
 		printf("Waiting for connection\n");
-		struct sockaddr_storage remote_addr;
+		
+    struct sockaddr_storage remote_addr;
 		socklen_t len = sizeof(remote_addr);
+
 		int32_t conn_sock = accept(server_socket, (struct sockaddr *)&remote_addr, &len);
 		if (conn_sock >= 0) {
       uint32_t recv_max_size = config->processing_queue.buffer_size;
 			uint8_t recv_buffer[recv_max_size];
-			uint32_t recv_len = recv(conn_sock, recv_buffer, recv_max_size, 0);
 
-			if (recv_len > 0) {
-				printf("====================================\n");
-				printf("Received %d bytes\n", recv_len);
-				printf("Data: %s\n", recv_buffer);
-        printf("Sending to processing queue from tcp server task...\n");
+			if(recv(conn_sock, recv_buffer, recv_max_size, 0) > 0) {
         xQueueSend(config->processing_queue.handle, recv_buffer, 0);
-				
-        send(conn_sock, recv_buffer, recv_len, 0);
-
-				printf("====================================\n");
+        if (uxQueueSpacesAvailable(config->processing_queue.handle) == 0) {
+          printf("Processing queue is full\n");
+          send(conn_sock, "1", 1, 0);
+        } else {
+          send(conn_sock, "0", 1, 0);
+        }
 			}
 
 			close(conn_sock);
 		}
-		vTaskDelay(pdMS_TO_TICKS(1000));
 	}
 }
 
