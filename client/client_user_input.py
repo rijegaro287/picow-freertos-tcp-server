@@ -4,7 +4,7 @@ ip_addr = "192.168.100.70"
 
 while True:
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((ip_addr, 8080))
+    client_socket.connect((ip_addr, 4242))
 
     print('='*50)
     print('Input a message:')
