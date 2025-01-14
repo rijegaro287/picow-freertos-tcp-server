@@ -1,12 +1,20 @@
 #include "processing.h"
 
 void processing_task(void *pvParameters) {
-  processing_queue_t *queue = (processing_queue_t*)pvParameters;
-  while (true) {
-    uint8_t recv_buffer[queue->buffer_size];
-    while(xQueueReceive(queue->handle, recv_buffer, 0) == pdTRUE) {
-      printf("Processing received data from processing_task: %s\n", recv_buffer);
+	ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+  queue_handles_t *handles = (queue_handles_t*)pvParameters;
+
+  uint32_t buffer_size = uxQueueGetQueueItemSize(handles->input_queue);
+  uint8_t recv_buffer[buffer_size];
+
+  while(true) {
+    if(xQueueReceive(handles->input_queue, recv_buffer, 0) == pdTRUE) {
+      /* Process data... */
+      printf("-- Processing data: %s\n", recv_buffer);
     }
-    vTaskDelay(pdMS_TO_TICKS(5000));
+    else {
+      vTaskDelay(pdMS_TO_TICKS(1));
+    }
   }
 }
